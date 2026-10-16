@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analyzer & Job Matcher</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main class="container">
+
+        <header class="hero">
+            <p class="eyebrow">AI-POWERED CAREER TOOL</p>
+
+            <h1>Resume Analyzer <span>&amp;</span> Job Matcher</h1>
+
+            <p class="subtitle">
+                Compare your resume with a job description and identify
+                matching skills and potential skill gaps.
+            </p>
+        </header>
+
+        <section class="card">
+            <h2>Analyze your resume</h2>
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                <label for="resume">Upload your resume</label>
+
+                <input
+                    type="file"
+                    id="resume"
+                    name="resume"
+                    accept=".pdf,.docx"
+                    required
+                >
+
+                <p class="hint">PDF or DOCX · Maximum file size: 5 MB</p>
+
+                <label for="job_description">Job description</label>
+
+                <textarea
+                    id="job_description"
+                    name="job_description"
+                    rows="9"
+                    maxlength="20000"
+                    placeholder="Paste the complete job description here..."
+                    required>{{ job_description }}</textarea>
+
+                <button type="submit">Analyze Resume</button>
+            </form>
+
+            {% if error %}
+                <div class="error" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+        </section>
+
+        {% if result %}
+        <section class="card results">
+            <p class="eyebrow">ANALYSIS REPORT</p>
+            <h2>Your matching results</h2>
+
+            <div class="score-section">
+                <div class="score-header">
+                    <span>Text similarity score</span>
+                    <strong>{{ result.similarity_score }}%</strong>
+                </div>
+
+                <div class="progress">
+                    <div class="progress-fill"
+                         style="width: {{ result.similarity_score }}%;">
+                    </div>
+                </div>
+
+                <p class="hint">
+                    This score measures text similarity between your
+                    resume and the job description. It is not an official
+                    ATS score or a probability of being hired.
+                </p>
+            </div>
+
+            <div class="skill-grid">
+
+                <div class="skill-panel">
+                    <h3>Matched skills</h3>
+                    {% if result.matched_skills %}
+                        <ul class="skill-list matched">
+                            {% for skill in result.matched_skills %}
+                                <li>{{ skill }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="hint">No matching skills found in the current skill list.</p>
+                    {% endif %}
+                </div>
+
+                <div class="skill-panel">
+                    <h3>Potentially missing skills</h3>
+                    {% if result.missing_skills %}
+                        <ul class="skill-list missing">
+                            {% for skill in result.missing_skills %}
+                                <li>{{ skill }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="hint">No missing skills found in the current skill list.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="detail-panel">
+                <h3>Skills detected in your resume</h3>
+
+                {% if result.resume_skills %}
+                    <p>{{ result.resume_skills | join(", ") }}</p>
+                {% else %}
+                    <p class="hint">
+                        No skills from the predefined skill list were detected.
+                    </p>
+                {% endif %}
+            </div>
+
+            <p class="disclaimer">
+                <strong>Note:</strong> This educational tool uses a
+                predefined skill vocabulary and text similarity.
+                A listed missing skill may be present under different
+                wording. Review the result manually before making
+                career decisions.
+            </p>
+        </section>
+        {% endif %}
+
+        <footer>
+            Built with Python, Flask, Scikit-learn and PyMuPDF
+        </footer>
+
+    </main>
+</body>
+</html>
